@@ -2,6 +2,9 @@ class RecipeCard extends HTMLElement {
   constructor() {
     // Part 1 Expose - TODO
 
+    super();
+    const shadow = this.attachShadow({ mode: 'open' });
+
     // You'll want to attach the shadow DOM here
   }
 
@@ -88,6 +91,94 @@ class RecipeCard extends HTMLElement {
     // Here's the root element that you'll want to attach all of your other elements to
     const card = document.createElement('article');
 
+    let image = document.createElement("img");
+    image.setAttribute("src", searchForKey(data, "thumbnail"));
+    image.setAttribute("src", searchForKey(data, "thumbnailUrl"));
+    image.setAttribute("alt", searchForKey(data, "headline"))
+    card.appendChild(image);
+
+    let recTitle = document.createElement("p");
+    recTitle.setAttribute("class", "title");
+    
+
+    let recTitleLink = document.createElement("a");
+    recTitleLink.setAttribute("href", getUrl(data));
+    recTitleLink.innerText = searchForKey(data, "headline");
+    recTitle.appendChild(recTitleLink);
+
+    card.appendChild(recTitle);
+
+    let recOrganization = document.createElement("p");
+    recOrganization.setAttribute("class", "organization");
+    recOrganization.textContent=getOrganization(data);
+    card.appendChild(recOrganization);
+
+
+
+    let recRating = document.createElement("div");
+    recRating.setAttribute("class", "rating");
+  
+
+    let recNoRev = document.createElement("span");
+    recNoRev.textContent = "No Reviews";
+
+    let recAvgReview = document.createElement("span");
+    recAvgReview.textContent = searchForKey(data, "ratingValue");
+
+    let recStars = document.createElement("img");
+
+    let avg = searchForKey(data, "ratingValue");
+    let starSrc;
+    let starAlt;
+    
+    if(avg < 1){
+      starSrc = "/assets/images/icons/0-star.svg";
+      starAlt = "0 stars";
+    } else if (avg < 2){
+      starSrc = "/assets/images/icons/1-star.svg";
+      starAlt = "1 stars";
+    } else if (avg < 3){
+      starSrc = "/assets/images/icons/2-star.svg";
+      starAlt = "2 stars";
+    } else if (avg < 4){
+      starSrc = "/assets/images/icons/3-star.svg";
+      starAlt = "3 stars";
+    } else if (avg < 5){
+      starSrc = "/assets/images/icons/4-star.svg";
+      starAlt = "4 stars";
+    } else if( searchForKey(data, "ratingValue")) {
+      starSrc = "/assets/images/icons/5-star.svg";
+      starAlt = "5 stars";
+    } else {
+      starSrc = "";
+      starAlt = "";
+    }
+
+    recStars.setAttribute("src", starSrc);
+    recStars.setAttribute("alt", starAlt);
+
+    let recNumReviews = document.createElement("span");
+    recNumReviews.textContent = searchForKey(data, "ratingCount");
+
+    if(! searchForKey(data, "ratingValue")) recRating.appendChild(recNoRev);
+    else{
+      recRating.appendChild(recAvgReview);
+      recRating.appendChild(recStars);
+      recRating.appendChild(recNumReviews);
+    }
+    card.appendChild(recRating);
+
+
+    let recTime = document.createElement("time");
+    recTime.textContent = convertTime(searchForKey(data, "totalTime"));
+    card.appendChild(recTime);
+
+    let recIngredients = document.createElement("p");
+    recIngredients.setAttribute("class", "ingredients");
+    recIngredients.textContent = createIngredientList(searchForKey(data, "recipeIngredient"));
+    card.appendChild(recIngredients);
+    
+
     // Some functions that will be helpful here:
     //    document.createElement()
     //    document.querySelector()
@@ -98,6 +189,9 @@ class RecipeCard extends HTMLElement {
 
     // Make sure to attach your root element and styles to the shadow DOM you
     // created in the constructor()
+
+    this.shadowRoot.appendChild(styleElem);
+    this.shadowRoot.appendChild(card);
 
     // Part 1 Expose - TODO
   }
